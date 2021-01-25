@@ -29,30 +29,22 @@ def signal_handler(signal, frame):
                 binary.append((lastTime - date).total_seconds())
                 lastTime = date
 
-    # Remove every other entry
-    on = False
     num = 0
     raw = ""
     ascii = ""
     for entry in binary:
-        if not on:
-            on = True
+        if num == 7:
+            raw += " " + str(round(abs(entry)))
+            num = 1
         else:
-            if num == 7:
-                raw += " " + str(round(abs(entry)))
-                on = False
-                num = 1
-            else:
-                raw += str(round(abs(entry)))
-                on = False
-                num = num + 1
+            raw += str(round(abs(entry)))
+            num = num + 1
 
     for word in raw.split(" "):
         ascii += chr(int(word[:8], 2)) + " "
 
     print("\n")
     print(ascii)
-    #print(raw)
     sys.exit(0)
 
 # This will listen for the control+c
@@ -66,6 +58,8 @@ except socket.error as msg:
     print(
     'Socket could not be created. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
     sys.exit()
+
+pak = 0
 
 # receive a packet
 while True:
@@ -96,10 +90,12 @@ while True:
     else:
         communications[str(s_addr)] = [dTime.now()]
 
-    print(' Source Address : ' + str(s_addr))
+    if pak == 0:
+        print("Receiving data")
+        print(' Source Address : ' + str(s_addr))
+        pak += 1
+    else:
+        print("Packet " + str(pak))
+        pak += 1
 
-    print(communications)
-
-
-
-
+    #print(communications)
